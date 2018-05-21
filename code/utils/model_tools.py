@@ -16,6 +16,9 @@ def save_network(your_model, your_weight_filename):
     weight_path = os.path.join('..', 'data', 'weights', your_weight_filename)
     config_path = os.path.join('..', 'data', 'weights', config_name)
     your_model_json = your_model.to_json()
+
+    #print('weight_path : {}'.format(weight_path))
+    #print('config_path : {}'.format(config_path))
     
     with open(config_path, 'w') as file:
         json.dump(your_model_json, file)  
