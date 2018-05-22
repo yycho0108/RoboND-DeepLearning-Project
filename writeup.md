@@ -19,16 +19,9 @@ followed by another separable convolution with 3x3 kernels with the respective o
 Each decoder block was composed of a 2x upsampled previous layer concatenated with the larger input from earlier encoding stages,
 followed by two-step separable convolutions similar to the encoder block. In fact, the processes are identical apart from the inputs.
 
-At whole, the network is a series of four encoder blocks, followed by a 1x1 convolution for the "final" representation, then four decoder blocks and the last convolutional layer that provides the output classification through the softmax activation. It ended up being a fairly deep network, and provded to be powerful yet speedy enough to work well for the project.
+At whole, the network is a series of four encoder blocks, followed by a 1x1 convolution for the "final" representation, then four decoder blocks and the last convolutional layer that provides the output classification through the softmax activation. It ended up being a fairly deep network, and proved to be powerful yet speedy enough to work well for the project.
 
-### Batch Normalization
-
-### Separable Convolution
-
-Depthwise Separable Convolutions are 
-
-### 1x1 Convolution
-
+Given the relatively simplistic environment and a fairly naive implementation, it is difficult to assume that this network would work for all targets; given the dataset, it would most certainly not work for targets who are not visually congruent to the one currently specified in the dataset.
 
 ## Network Tuning
 
@@ -49,6 +42,8 @@ In the final training session of the model, I used the following set of hyperpar
 | Workers           | 4     |
 | Dropout           | 0.2   |
 | L2 Regularization | 1e-4  |
+
+Noteworthy modifications from the table will be discussed below.
 
 ### Learning Rate
 
@@ -88,7 +83,7 @@ In order to mitigate this issue, I introduced 0.2 dropout in the final encoding 
 
 However; too strong of a regularization (1e-3) proved to slow down learning and hurt the performance of the model. After twiddling with the term for a bit, I settled with 1e-4.
 
-This way, the network learned to better generalize to the samples, rather than rote memorizization of the training samples.
+This way, the network learned to better generalize to the samples, rather than rote memorization of the training samples.
 
 ### Results
 
@@ -97,3 +92,13 @@ This way, the network learned to better generalize to the samples, rather than r
 After tuning the network, the final score was `0.474` with a validation loss (without regularization) of `0.0291`. Note that the training curve is quite stable.
 
 ## Future Enhancements
+
+### Network Size
+
+Given the depth of the network and the environment, it is fairly likely that the current architecture is a bit of an overkill; since the size and depth of the network correlates with the computational resources and the speed, any real application for semantic segmentation would likely benefit from a more finely engineered network with fewer parameters.
+
+## Conclusion
+
+Prior to this project, I was aware of a fair bit of object detection networks, such as YOLO or SSD; I didn't particularly look to FCNs for fear that they would not be able to perform as well, or take too long.
+
+I was quite surprised by the ease with which I could implement a fully functional FCN, and how it could seamlessly be integrated into a very compelling application such as person-following. I certainly plan to use them for a number of future projects.
