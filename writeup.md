@@ -25,15 +25,16 @@ After tuning the network, the final score was 0.474.
 
 In the final training session of the model, I used the following set of hyperparameters:
 
-| Parameter        | Value |
-|:----------------:|:-----:|
-| Learning Rate    | 1e-3  |
-| LR Decay         | 2e-4  |
-| Batch Size       | 32    |
-| Epochs           | 50    |
-| Epoch Steps      | 100   |
-| Validation Steps | 50    |
-| Workers          | 4     |
+| Parameter         | Value |
+|:-----------------:|:-----:|
+| Learning Rate     | 1e-3  |
+| LR Decay          | 2e-4  |
+| Batch Size        | 32    |
+| Epochs            | 50    |
+| Epoch Steps       | 100   |
+| Validation Steps  | 50    |
+| Workers           | 4     |
+| L2 Regularization | 1e-4  |
 
 #### Learning Rate
 
@@ -42,7 +43,7 @@ The ballpark learning rate was set to be about 1e-3 from experience. However, in
 Keras supports the following decay scheme by default:
 
 ```python
-lr = lr * (1. / (1. + decay * n))
+lr = lr0 * (1. / (1. + decay * n))
 ```
 
 Where n is the total update steps from the beginning.
@@ -63,15 +64,14 @@ The batch size was determined partly based on experience; batch size of 32 prove
 
 In terms of the model training, what is really critical is the total number of steps, i.e. the number of epochs multiplied by the number of steps in each epoch.
 
-As far as monitoring progress goes, I decided that it is sufficient to look at the results every 100 steps, and based on the runs it seemed that the network converged after approximately 5000 steps. The number of epochs were determined accordingly.
+As far as monitoring progress goes, I decided that it is sufficient to look at the results every 100 steps. Based on the runs it seemed that the network converged rather quickly (compared to some of the other architectures); I set the total steps to 5000 for a bit of leeway. The number of epochs were determined accordingly.
 
-
-### Regularization
+#### Regularization
 
 Based on the initial runs, there was strong evidence of the network overfitting to the training samples.
 
-In order to mitigate this issue, I introduced 0.2 dropout in the final encoding after the 1x1 convolution,
+In order to mitigate this issue, I introduced 0.2 dropout in the final encoding after the 1x1 convolution, as well as l2 regularization to all of the trainable parameters in each convolution stages.
 
-as well as l2 regularization with 1e-4 weights to all of the trainable parameters in each convolution stages.
+However; too strong of a regularization (1e-3) proved to slow down learning and hurt the performance of the model. After twiddling with the term for a bit, I settled with 1e-4.
 
 This way, the network learned to better generalize to the samples, rather than rote memorizization of the training samples.
