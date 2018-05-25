@@ -38,6 +38,8 @@ from tensorflow.python.ops import array_ops
 from tensorflow.python.ops import image_ops
 from tensorflow.python.ops import nn
 
+from tensorflow import depth_to_space
+
 import numpy as np
 
 # pylint: disable=redefined-builtin,line-too-long
@@ -639,6 +641,46 @@ class BilinearUpSampling2D(Layer):
     base_config = super(BilinearUpSampling2D, self).get_config()
     return dict(list(base_config.items()) + list(config.items()))
 
+class DepthToSpace(Layer):
+  """
+  Keras Wrapper for tf.depth_to_space()
+  Warning : Assumes data_format == NHWC due to tensorflow API == 1.2.1.
+  """
+  def __init__(self, size=2, data_format=None, **kwargs):
+    super(DepthToSpace, self).__init__(**kwargs)
+    self.data_format = conv_utils.normalize_data_format(data_format)
+    self.size = size
+    self.input_spec = InputSpec(ndim=4)
+
+  def _compute_output_shape(self, input_shape):
+    input_shape = tensor_shape.TensorShape(input_shape).as_list()
+    if self.data_format == 'channels_first':
+      height = self.size[0] * input_shape[
+          2] if input_shape[2] is not None else None
+      width = self.size[1] * input_shape[
+          3] if input_shape[3] is not None else None
+      return tensor_shape.TensorShape(
+          [input_shape[0], input_shape[1], height, width])
+    else:
+      height = self.size[0] * input_shape[
+          1] if input_shape[1] is not None else None
+      width = self.size[1] * input_shape[
+          2] if input_shape[2] is not None else None
+      return tensor_shape.TensorShape(
+          [input_shape[0], height, width, input_shape[3]])
+
+  def call(self, inputs):
+    output_layer = depth_to_space(inputs, block_size=self.size)
+    return output_layer
+
+  def get_config(self):
+    config = {'size': self.size, 'data_format': self.data_format}
+    base_config = super(DepthToSpace, self).get_config()
+    return dict(list(base_config.items()) + list(config.items()))
 
 # add this to custom objects for restoring model save files
-get_custom_objects().update({'SeparableConv2DKeras': SeparableConv2DKeras, 'BilinearUpSampling2D':BilinearUpSampling2D})
+get_custom_objects().update({
+    'SeparableConv2DKeras': SeparableConv2DKeras,
+    'BilinearUpSampling2D':BilinearUpSampling2D,
+    'DepthToSpace':DepthToSpace
+})
