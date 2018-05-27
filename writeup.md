@@ -43,7 +43,15 @@ One type of convolution that our network makes heavy use of is a 1x1 convolution
 
 ![figs/1x1_conv.png](figs/1x1_conv.png)
 
-In essence, a 1x1 convolution is equivalent to applying a cross-channel matrix multiplication at each local grid, as it will be discussed later, this is an effective technique for downsizing neural networks without undermining its performance too much by creating more compact feature representations.
+In essence, a 1x1 convolution is equivalent to applying a cross-channel matrix multiplication at each local grid; in doing so, it also preserves the spatial relationships. This is an effective technique for downsizing neural networks without undermining its performance too much by creating more compact feature representations.
+
+In relation to fully connected layers, [Here](https://www.facebook.com/yann.lecun/posts/10152820758292143) is a quote from Yann Lecunn himself: 
+
+*"In Convolutional Nets, there is no such thing as “fully-connected layers”. There are only convolution layers with 1x1 convolution kernels and a full connection table."*
+
+Indeed, 1x1 convolutions are mathematically equivalent to fully connected matrix-multiplication operation applied at each grid cell; in other words, traditional formulations of fully connected layers are essentially 1x1 convolutions where the input width and height happens to be exactly one.
+
+In employing 1x1 convolutions, even networks that have been previously trained with fully-connected layers can be converted into one that can run inference on larger images (assuming that the scales of information in the images are at similar magnitudes as the ones that it had been trained on). In our case, because the network is symmetrical, it would also work for images that are of different size from the training samples, assuming that objects are still of similar size. In order to mitigate possible artifacts related to scales, the popular [YOLO-v2](https://arxiv.org/abs/1612.08242) network was indeed trained on various input sizes.
 
 #### Separable Convolution
 
